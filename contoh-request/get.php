@@ -2,7 +2,7 @@
 require '../api.php';
 
 // Point to local controller endpoint
-$client = new API('http://localhost/project/belajar_cURL/api');
+$client = new API('http://localhost/project/enilai/controller');
 
 try {
     $response = $client->get('/controller.php', [

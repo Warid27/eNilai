@@ -1,6 +1,6 @@
 <?php 
 
-$BASE_URL = "/project/belajar_cURL";
+$BASE_URL = "http://localhost/project/eNilai";
 $DB_HOST = 'localhost';
 $DB_USERNAME = 'root';
 $DB_PASSWORD = 'root';

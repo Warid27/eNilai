@@ -1,16 +1,20 @@
 <?php
-$host = 'localhost';
-$user = 'root';
-$pass = ''; // Replace with your actual password
-$db   = 'enilai';
 
-// Create connection
-$conn = new mysqli($host, $user, $pass, $db);
+include dirname(__FILE__) . "/../config.php";
 
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+
+// Database connection configuration
+$host = $DB_HOST;
+$username = $DB_USERNAME;
+$password = $DB_PASSWORD;
+$dbname = $DB_NAME;
+
+
+try {
+    $conn = new mysqli($host, $username, $password, $dbname);
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+} catch (Exception $e) {
+    die("Error: " . $e->getMessage());
 }
-
-// echo "Connected successfully"; // Uncomment for testing
-?>

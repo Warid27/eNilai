@@ -1,7 +1,7 @@
 <?php
 require '../api.php';
 
-$client = new API('http://localhost/project/belajar_cURL/api', [
+$client = new API($baseURL, [
     'Authorization' => 'Bearer YOUR_TOKEN'
 ]);
 
