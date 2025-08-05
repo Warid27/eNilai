@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jul 29, 2025 at 07:25 AM
+-- Generation Time: Aug 05, 2025 at 12:28 AM
 -- Server version: 8.4.0
 -- PHP Version: 8.3.1
 
@@ -32,6 +32,14 @@ CREATE TABLE `gallery` (
   `image` varchar(255) DEFAULT NULL,
   `id_user` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+
+--
+-- Dumping data for table `gallery`
+--
+
+INSERT INTO `gallery` (`id`, `image`, `id_user`) VALUES
+(2, 'public/assets/uploads/1754352936_CardCategory-Umrah.png', 3),
+(3, 'public/assets/uploads/1754352961_CardCategory-WisataAlam.png', 4);
 
 -- --------------------------------------------------------
 
@@ -73,7 +81,8 @@ CREATE TABLE `scores` (
 --
 
 INSERT INTO `scores` (`id`, `id_user`, `scores`) VALUES
-(2, 4, '{\"Matematika\": 85, \"Bahasa Inggris\": 88, \"Bahasa Indonesia\": 90}');
+(2, 4, '{\"Matematika\": 95, \"Bahasa Inggris\": 98, \"Bahasa Indonesia\": 90}'),
+(4, 10, '{\"Matematika\": 50, \"Bahasa Inggris\": 100, \"Bahasa Indonesia\": 0}');
 
 -- --------------------------------------------------------
 
@@ -99,8 +108,10 @@ INSERT INTO `users` (`id`, `username`, `password`, `nis`, `id_role`) VALUES
 (5, 'guru indo', '$2y$10$aLDM19ND54mu9qDOWzteq.6ysPF0cHd5Z1dgcnR8UvFJVItZUDKre', NULL, 2),
 (6, 'guru inggris', '$2y$10$AvhAdOL1YtqXqlU2Xp0tGOsPKtwoiRolD9Nu4QXrXcRiupXDSyB36', NULL, 3),
 (7, 'guru mtk', '$2y$10$mTANF0W9WAYuBxye989RmeBBCxv8pEkS9JP1xXln.ijVk2LDG5u3O', NULL, 4),
-(9, 'warid', '$2y$10$/P1asbP.ai7XOZoFWFoZdeHY18TP4VUW6l0/zD0AV.e0dgpWohOuO', 22224, 6),
-(10, 'Siswa Baru', '$2y$10$a0gxfTSIB3imT5K0JBMDW.lCP/AjPlLKrG9/nOROW8RJpcYNBkWVK', 555555, 6);
+(9, 'warid', '$2y$10$/P1asbP.ai7XOZoFWFoZdeHY18TP4VUW6l0/zD0AV.e0dgpWohOuO', 12344, 6),
+(10, 'Siswa Baru', '$2y$10$a0gxfTSIB3imT5K0JBMDW.lCP/AjPlLKrG9/nOROW8RJpcYNBkWVK', 555555, 6),
+(12, 'walkel', '$2y$10$YOOviw8WlJdZyQEcV0Rj7OcvK/251nR6IpP68VpY/EkebnEMYOtY2', NULL, 5),
+(13, 'walkel2', '$2y$10$vfeeWYHutkKVSldEk/nEseOkmaq/c3fpLNCvOPcaEPdVjHzpE756K', NULL, 5);
 
 --
 -- Indexes for dumped tables
@@ -142,7 +153,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `gallery`
 --
 ALTER TABLE `gallery`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `roles`
@@ -154,13 +165,13 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT for table `scores`
 --
 ALTER TABLE `scores`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- Constraints for dumped tables
