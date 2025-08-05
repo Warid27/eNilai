@@ -99,15 +99,36 @@ class UserController
         $roles = $this->role->getAllRoles();
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $username = $_POST['username'] ?? '';
-            $password = $_POST['password'] ?? '';
-            $nis = $_POST['nis'] ?? null;
-            $id_role = $_POST['id_role'] ?? 2;
+            $username = trim($_POST['username'] ?? '');
+            $password = trim($_POST['password'] ?? '');
+            $nis = trim($_POST['nis'] ?? '');
+            $id_role = (int)($_POST['id_role'] ?? 2);
 
-            // Only hash the password if it's provided (not empty)
-            $hashedPassword = $password ? password_hash($password, PASSWORD_DEFAULT) : null;
+            // Validasi input wajib
+            if (empty($username)) {
+                $_SESSION['error'] = 'Username wajib diisi!';
+                header('Location: ?page=user&act=edit&id=' . $id);
+                exit;
+            }
 
-            // Pass the hashed password (or null to keep the old one) to update method
+            // Handle nis based on role
+            if ($id_role == 6) {
+                // For role 6, nis must be a valid integer
+                if (empty($nis) || !is_numeric($nis) || (int)$nis <= 0) {
+                    $_SESSION['error'] = 'NIS wajib diisi dengan angka yang valid untuk role ini!';
+                    header('Location: ?page=user&act=edit&id=' . $id);
+                    exit;
+                }
+                $nis = (int)$nis; // Cast to integer
+            } else {
+                // For other roles, nis is optional; set to NULL if empty
+                $nis = empty($nis) ? null : (int)$nis;
+            }
+
+            // Hash password if provided
+            $hashedPassword = !empty($password) ? password_hash($password, PASSWORD_DEFAULT) : null;
+
+            // Update database
             if ($this->user->update($id, $username, $hashedPassword, $nis, $id_role)) {
                 $_SESSION['message'] = 'Pengguna berhasil diperbarui!';
             } else {
@@ -119,7 +140,6 @@ class UserController
 
         require_once dirname(__FILE__) . '/../views/UserManagementView.php';
     }
-
     public function delete($id)
     {
         if (!isset($_SESSION['user_id'])) {

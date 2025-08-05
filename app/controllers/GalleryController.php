@@ -22,7 +22,18 @@ class GalleryController {
             if (!is_dir($upload_dir)) {
                 mkdir($upload_dir, 0755, true);
             }
+            if (!is_writable($upload_dir)) {
+                $_SESSION['error'] = 'Folder uploads tidak memiliki izin tulis!';
+                header('Location: ?page=gallery');
+                exit;
+            }
             $file = $_FILES['image'];
+            $allowed_types = ['image/jpeg', 'image/png'];
+            if (!in_array($file['type'], $allowed_types)) {
+                $_SESSION['error'] = 'Hanya file JPEG atau PNG yang diizinkan!';
+                header('Location: ?page=gallery');
+                exit;
+            }
             $filename = time() . '_' . basename($file['name']);
             $target = $upload_dir . $filename;
             $image_path = "public/assets/uploads/" . $filename;
@@ -67,8 +78,12 @@ class GalleryController {
         $edit = null;
         if (isset($_GET['edit'])) {
             $edit = $this->gallery->getImageById($_GET['edit']);
+            if (!$edit) {
+                $_SESSION['error'] = 'Gambar tidak ditemukan!';
+                header('Location: ?page=gallery');
+                exit;
+            }
         }
         require_once dirname(__FILE__) . '/../views/GalleryView.php';
     }
 }
-?>

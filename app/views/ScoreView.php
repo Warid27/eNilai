@@ -15,14 +15,8 @@ if (!isset($_SESSION['user_id']) && $currentPage !== 'login') {
     header('Location: ?page=login');
     exit;
 }
-if ($_SESSION['id_role'] == 6 && $currentPage !== 'dashboard') { 
-    $_SESSION['error'] = 'Akses ditolak! Hanya guru yang dapat mengelola nilai.';
-    header('Location: ?page=dashboard');
-    exit;
-}
 
 require_once dirname(__FILE__) . '/../components/TableComponent.php';
-
 $customHeaders = [
     'username' => 'Nama',
     'nis' => 'NIS',
@@ -30,17 +24,42 @@ $customHeaders = [
     'value' => 'Nilai',
     'actions' => 'Aksi'
 ];
+if ($_SESSION['id_role'] == 6) {
+    $customHeaders = [
+        'username' => 'Nama',
+        'nis' => 'NIS',
+        'subjects' => 'Mata Pelajaran',
+        'value' => 'Nilai',
+    ];
+}
+
+echo "ROLE  {$_SESSION['id_role']}";
 
 $mapel = [
     "Matematika",
     "Bahasa Inggris",
     "Bahasa Indonesia"
 ];
+if ($_SESSION['id_role'] == 2) {
+    $mapel = [
+        "Bahasa Indonesia"
+    ];
+}
+if ($_SESSION['id_role'] == 3) {
+    $mapel = [
+        "Bahasa Inggris"
+    ];
+}
+if ($_SESSION['id_role'] == 4) {
+    $mapel = [
+        "Matematika"
+    ];
+}
 
-// Add actions column to each score record
-if (isset($scores) && $currentPage == "nilai") {
+// Add actions column to each score record for non-role 6 users
+if (isset($scores) && $currentPage == "nilai" && !isset($_GET['edit']) && $_SESSION['id_role'] != 6) {
     $filterScores = array_map(function ($score) {
-        $score['actions'] = "<a class='btn-edit' href='?page=nilai&edit={$score['id']}'></a><a class='btn-delete' href='?page=nilai&delete={$score['id']}' onclick='return confirm(\"Hapus nilai ini?\")'></a>";
+        $score['actions'] = "<a class='btn-edit' href='?page=nilai&edit={$score['id']}'>Edit</a><a class='btn-delete' href='?page=nilai&delete={$score['id']}' onclick='return confirm(\"Hapus nilai ini?\")'>Hapus</a>";
         return $score;
     }, $scores);
 
@@ -49,12 +68,20 @@ if (isset($scores) && $currentPage == "nilai") {
         unset($score['id_user']);
         return $score;
     }, $filterScores);
+} else if (isset($scores) && $currentPage == "nilai" && !isset($_GET['edit'])) {
+    $filteredScores = array_map(function ($score) {
+        unset($score['id']);
+        unset($score['id_user']);
+        return $score;
+    }, $scores ?? []);
 }
 ?>
 
 <?php if ($currentPage == 'nilai' && !isset($_GET['edit'])): ?>
     <h2>Manajemen Nilai</h2>
-    <a class="btn-add success" style="margin-bottom: 1rem;" href="?page=nilai_create">Tambah Nilai</a>
+    <?php if ($_SESSION['id_role'] != 6): ?>
+        <a class="btn-add success" style="margin-bottom: 1rem;" href="?page=nilai_create">Tambah Nilai</a>
+    <?php endif; ?>
     <?php if (isset($filteredScores) && !empty($filteredScores)): ?>
         <?php renderTable($filteredScores, $customHeaders); ?>
     <?php endif; ?>
@@ -68,7 +95,7 @@ if (isset($scores) && $currentPage == "nilai") {
         <label>Pengguna:</label>
         <select name="id_user" id="userSelect" required>
             <option value="">-- Pilih Pengguna --</option>
-            <?php foreach ($scoreUsers as $user): ?>
+            <?php foreach ($users as $user): ?>
                 <option value="<?php echo $user['id']; ?>" <?php echo $edit['id_user'] == $user['id'] ? 'selected' : ''; ?>>
                     <?php echo htmlspecialchars($user['username']); ?>
                 </option>
@@ -89,17 +116,21 @@ if (isset($scores) && $currentPage == "nilai") {
         <?php endif; ?>
 
         <label>Mata Pelajaran:</label>
-        <select name="subjects" id="subjectSelect" required>
-            <option value="">-- Pilih Mata Pelajaran --</option>
-            <?php foreach ($mapel as $subject): ?>
-                <option value="<?php echo htmlspecialchars($subject); ?>" <?php echo (isset($edit['subjects']) && $edit['subjects'] == $subject) ? 'selected' : ''; ?>>
-                    <?php echo htmlspecialchars($subject); ?>
-                </option>
-            <?php endforeach; ?>
-        </select><br>
+        <?php if (count($mapel) === 1): ?>
+            <input type="text" name="subjects" id="subjectSelect" value="<?php echo htmlspecialchars($mapel[0]); ?>" readonly><br>
+        <?php else: ?>
+            <select name="subjects" id="subjectSelect" required>
+                <option value="">-- Pilih Mata Pelajaran --</option>
+                <?php foreach ($mapel as $subject): ?>
+                    <option value="<?php echo htmlspecialchars($subject); ?>" <?php echo (isset($edit['subjects']) && $edit['subjects'] == $subject) ? 'selected' : ''; ?>>
+                        <?php echo htmlspecialchars($subject); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select><br>
+        <?php endif; ?>
 
         <label>Nilai:</label>
-        <input type="number" name="value" step="0.01" value="<?php echo htmlspecialchars($edit['value'] ?? '', ENT_QUOTES); ?>" required><br>
+        <input type="number" name="value" step="1" min="0" max="100" value="<?php echo htmlspecialchars($edit['value'] ?? '', ENT_QUOTES); ?>" required><br>
 
         <button type="submit">Update Nilai</button>
     </form>

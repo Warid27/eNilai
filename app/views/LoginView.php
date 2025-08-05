@@ -1,11 +1,14 @@
 <?php
-
-$base_path = dirname(dirname($_SERVER['SCRIPT_NAME'])) . '/';
-$base_path = '/' . trim($base_path, '/') . '/'; // Clean it
+session_start();
+$base_path = defined('BASE_PATH') ? BASE_PATH : dirname(dirname($_SERVER['SCRIPT_NAME'])) . '/';
+$base_path = '/' . trim($base_path, '/') . '/';
 define('BASE_PATH', $base_path);
 
-
 ob_start();
+if (isset($_SESSION['user_id'])) {
+    header('Location: ?page=dashboard');
+    exit;
+}
 ?>
 <h2>Login</h2>
 <form method="POST" action="?page=login">

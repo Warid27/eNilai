@@ -20,11 +20,6 @@ class ScoreController
             header('Location: ?page=login');
             exit;
         }
-        if ($_SESSION['id_role'] == 6) {
-            $_SESSION['error'] = 'Akses ditolak! Hanya guru yang dapat mengelola nilai.';
-            header('Location: ?page=login');
-            exit;
-        }
 
         $scores = $this->score->getAll();
         $scoreUsers = $this->user->getUsersWithoutScores();
@@ -44,7 +39,7 @@ class ScoreController
             exit;
         }
 
-        $users = $this->user->getAll();
+        $scoreUsers = $this->user->getUsersWithoutScores();
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id_user = (int)($_POST['id_user'] ?? $_SESSION['user_id']);
@@ -104,6 +99,7 @@ class ScoreController
         }
 
         $score = $this->score->getById($id);
+        $edit = $this->score->getById($id);
         $users = $this->user->getAll();
 
         if (!$score) {

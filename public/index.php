@@ -4,21 +4,29 @@
 // error_reporting(E_ALL);
 session_start();
 
-// ✅ Define base URL dynamically
-$base_url = strtok($_SERVER['REQUEST_URI'], '?'); 
-$script_dir = dirname($_SERVER['SCRIPT_NAME']);
-$base_path = rtrim(dirname($script_dir), '/');
-$base_path = $base_path . '/'; 
-
-// Optional: define constant
+// Define base URL dynamically
+$base_path = dirname(dirname($_SERVER['SCRIPT_NAME'])) . '/';
+$base_path = '/' . trim($base_path, '/') . '/';
 define('BASE_PATH', $base_path);
 
+// Require controllers
 require_once dirname(__FILE__) . '/../app/controllers/AuthController.php';
 require_once dirname(__FILE__) . '/../app/controllers/ScoreController.php';
 require_once dirname(__FILE__) . '/../app/controllers/GalleryController.php';
 require_once dirname(__FILE__) . '/../app/controllers/UserController.php';
 
-$page = $_GET['page'] ?? 'home';
+// Get page parameter
+$page = trim($_GET['page'] ?? 'home');
+
+// Restricted pages requiring login
+$restricted_pages = ['dashboard', 'nilai', 'gallery', 'user', 'nilai_create', 'user_create'];
+
+// Redirect to login if accessing restricted page without login
+if (in_array($page, $restricted_pages) && !isset($_SESSION['user_id'])) {
+    $_SESSION['error'] = 'Silakan login terlebih dahulu!';
+    header('Location: ?page=login');
+    exit;
+}
 
 switch ($page) {
     case 'home':
@@ -65,7 +73,6 @@ switch ($page) {
         break;
     case 'nilai_create':
         $controller = new ScoreController();
-        $controller->index();
         $controller->create();
         break;
     default:

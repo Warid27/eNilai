@@ -29,7 +29,7 @@ $customHeaders = [
 if (isset($users)) {
     // Add actions and keep ID in data, but don't display it
     $filterUsers = array_map(function ($user) {
-        $user['actions'] = "<a class='btn-edit' href='?page=user&edit={$user['id']}'></a><a class='btn-delete' href='?page=user&delete={$user['id']}' onclick='return confirm(\"Hapus pengguna ini?\")'></a>";
+        $user['actions'] = "<a class='btn-edit' href='?page=user&edit={$user['id']}'>Edit</a><a class='btn-delete' href='?page=user&delete={$user['id']}' onclick='return confirm(\"Hapus pengguna ini?\")'>Hapus</a>";
         return $user;
     }, $users);
 
