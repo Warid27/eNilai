@@ -1,16 +1,19 @@
 <?php
 require_once dirname(__FILE__) . '/../models/User.php';
 require_once dirname(__FILE__) . '/../models/Role.php';
+require_once dirname(__FILE__) . '/../models/Score.php';
 
 class UserController
 {
     private $user;
     private $role;
+    private $score;
 
     public function __construct()
     {
         $this->user = new User();
         $this->role = new Role();
+        $this->score = new Score();
     }
 
     public function index()
@@ -20,9 +23,10 @@ class UserController
             header('Location: ?page=login');
             exit;
         }
-        if ($_SESSION['id_role'] != 1) {
-            $_SESSION['error'] = 'Akses ditolak! Hanya admin yang dapat mengelola pengguna.';
-            header('Location: ?page=login');
+        // Role-based access: Only superadmin (0) and admin (1) can manage users
+        if ($_SESSION['id_role'] > 1) {
+            $_SESSION['error'] = 'Akses ditolak! Hanya superadmin dan admin yang dapat mengelola pengguna.';
+            header('Location: ?page=dashboard');
             exit;
         }
         $users = $this->user->getAll();
@@ -37,9 +41,10 @@ class UserController
             header('Location: ?page=login');
             exit;
         }
-        if ($_SESSION['id_role'] != 1) {
-            $_SESSION['error'] = 'Akses ditolak! Hanya admin yang dapat mengelola pengguna.';
-            header('Location: ?page=login');
+        // Role-based access: Only superadmin (0) and admin (1) can manage users
+        if ($_SESSION['id_role'] > 1) {
+            $_SESSION['error'] = 'Akses ditolak! Hanya superadmin dan admin yang dapat mengelola pengguna.';
+            header('Location: ?page=dashboard');
             exit;
         }
 
@@ -54,14 +59,14 @@ class UserController
             // Validasi input wajib
             if (empty($username) || empty($password)) {
                 $_SESSION['error'] = 'Username dan password wajib diisi!';
-                header('Location: ?page=user&act=add');
+                header('Location: ?page=users&act=add');
                 exit;
             }
 
             // Validasi khusus untuk role 6: nis wajib diisi
             if ($id_role == 6 && (is_null($nis) || $nis === '')) {
                 $_SESSION['error'] = 'NIS wajib diisi untuk role yang dipilih!';
-                header('Location: ?page=user&act=add');
+                header('Location: ?page=users&act=add');
                 exit;
             }
 
@@ -70,12 +75,20 @@ class UserController
 
             // Simpan ke database
             if ($this->user->create($username, $hashedPassword, $nis, $id_role)) {
+                // If the new user is a student (role 6), automatically create score record
+                if ($id_role == 6) {
+                    // Get the newly created user ID
+                    $newUser = $this->user->getByUsername($username);
+                    if ($newUser) {
+                        $this->score->createDefaultScores($newUser['id']);
+                    }
+                }
                 $_SESSION['message'] = 'Pengguna berhasil ditambahkan!';
             } else {
                 $_SESSION['error'] = 'Gagal menambahkan pengguna!';
             }
 
-            header('Location: ?page=user');
+            header('Location: ?page=users');
             exit;
         }
 
@@ -89,9 +102,10 @@ class UserController
             header('Location: ?page=login');
             exit;
         }
-        if ($_SESSION['id_role'] != 1) {
-            $_SESSION['error'] = 'Akses ditolak! Hanya admin yang dapat mengelola pengguna.';
-            header('Location: ?page=login');
+        // Role-based access: Only superadmin (0) and admin (1) can manage users
+        if ($_SESSION['id_role'] > 1) {
+            $_SESSION['error'] = 'Akses ditolak! Hanya superadmin dan admin yang dapat mengelola pengguna.';
+            header('Location: ?page=dashboard');
             exit;
         }
 
@@ -107,7 +121,7 @@ class UserController
             // Validasi input wajib
             if (empty($username)) {
                 $_SESSION['error'] = 'Username wajib diisi!';
-                header('Location: ?page=user&act=edit&id=' . $id);
+                header('Location: ?page=users&act=edit&id=' . $id);
                 exit;
             }
 
@@ -116,7 +130,7 @@ class UserController
                 // For role 6, nis must be a valid integer
                 if (empty($nis) || !is_numeric($nis) || (int)$nis <= 0) {
                     $_SESSION['error'] = 'NIS wajib diisi dengan angka yang valid untuk role ini!';
-                    header('Location: ?page=user&act=edit&id=' . $id);
+                    header('Location: ?page=users&act=edit&id=' . $id);
                     exit;
                 }
                 $nis = (int)$nis; // Cast to integer
@@ -134,7 +148,7 @@ class UserController
             } else {
                 $_SESSION['error'] = 'Gagal memperbarui pengguna!';
             }
-            header('Location: ?page=user');
+            header('Location: ?page=users');
             exit;
         }
 
@@ -147,9 +161,10 @@ class UserController
             header('Location: ?page=login');
             exit;
         }
-        if ($_SESSION['id_role'] != 1) {
-            $_SESSION['error'] = 'Akses ditolak! Hanya admin yang dapat mengelola pengguna.';
-            header('Location: ?page=login');
+        // Role-based access: Only superadmin (0) and admin (1) can manage users
+        if ($_SESSION['id_role'] > 1) {
+            $_SESSION['error'] = 'Akses ditolak! Hanya superadmin dan admin yang dapat mengelola pengguna.';
+            header('Location: ?page=dashboard');
             exit;
         }
         if ($this->user->delete($id)) {
@@ -157,7 +172,7 @@ class UserController
         } else {
             $_SESSION['error'] = 'Gagal menghapus pengguna!';
         }
-        header('Location: ?page=user');
+        header('Location: ?page=users');
         exit;
     }
 }

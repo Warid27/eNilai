@@ -3,20 +3,87 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+
+// Get user role name for display (inline function to avoid conflicts)
+if (!function_exists('getRoleName')) {
+    function getRoleName($roleId) {
+        $roles = [
+            0 => 'Superadmin',
+            1 => 'Admin', 
+            2 => 'Guru Bahasa Indonesia',
+            3 => 'Guru Bahasa Inggris',
+            4 => 'Guru Matematika',
+            5 => 'Wali Kelas',
+            6 => 'Siswa'
+        ];
+        return $roles[$roleId] ?? 'Unknown';
+    }
+}
 ?>
-<div class="navbar">
-    <a href="?page=home"><i class="fas fa-home"></i> Home</a>
-    <?php if (isset($_SESSION['user_id'])): ?>
-        <?php if (in_array($_SESSION['id_role'], [1, 2, 3, 4, 5, 6])): ?>
-            <a href="?page=nilai"><i class="fas fa-book"></i> Nilai</a>
-        <?php endif; ?>
-        <a href="?page=gallery"><i class="fas fa-image"></i> Galeri</a>
-        <a href="?page=dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-        <?php if ($_SESSION['id_role'] == 1): ?>
-            <a href="?page=user"><i class="fas fa-users"></i> Pengguna</a>
-        <?php endif; ?>
-        <a href="?page=logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
-    <?php else: ?>
-        <a href="?page=login"><i class="fas fa-sign-in-alt"></i> Login</a>
-    <?php endif; ?>
-</div>
+
+<nav class="modern-navbar">
+    <div class="navbar-container">
+        <!-- Left side: Logo and burger menu -->
+        <div class="navbar-left">
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <button class="burger-menu" onclick="toggleSidebar()" aria-label="Toggle menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            <?php endif; ?>
+            
+            <a href="?page=home" class="navbar-brand">
+                <i class="fas fa-graduation-cap"></i>
+                <span>eNilai</span>
+            </a>
+        </div>
+        
+        <!-- Right side: User menu or login -->
+        <div class="navbar-right">
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <!-- User Menu -->
+                <div class="user-menu">
+                    <button class="user-menu-btn" onclick="toggleUserDropdown()" aria-label="User menu">
+                        <div class="user-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="user-info">
+                            <span class="user-name"><?= htmlspecialchars($_SESSION['username'] ?? 'User') ?></span>
+                            <span class="user-role"><?= htmlspecialchars(getRoleName($_SESSION['id_role'] ?? 6)) ?></span>
+                        </div>
+                        <i class="fas fa-chevron-down dropdown-arrow"></i>
+                    </button>
+                    
+                    <!-- User Dropdown -->
+                    <div class="user-dropdown" id="userDropdown">
+                        <div class="dropdown-header">
+                            <div class="user-avatar-large">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="user-details">
+                                <h4><?= htmlspecialchars($_SESSION['username'] ?? 'User') ?></h4>
+                                <p><?= htmlspecialchars(getRoleName($_SESSION['id_role'] ?? 6)) ?></p>
+                            </div>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <a href="?page=profile" class="dropdown-item">
+                            <i class="fas fa-user-circle"></i>
+                            <span>Profile</span>
+                        </a>
+                        <a href="?page=logout" class="dropdown-item logout">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Log Out</span>
+                        </a>
+                    </div>
+                </div>
+            <?php else: ?>
+                <!-- Login Button -->
+                <a href="?page=login" class="login-btn">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>Login</span>
+                </a>
+            <?php endif; ?>
+        </div>
+    </div>
+</nav>

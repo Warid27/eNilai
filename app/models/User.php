@@ -100,4 +100,52 @@ class User
         $stmt = $this->db->prepare($query);
         return $stmt->execute(['id' => $id]);
     }
+
+    /**
+     * Get user by username for profile controller
+     * @param string $username
+     * @return array|false
+     */
+    public function getByUsername($username)
+    {
+        $query = "SELECT * FROM users WHERE username = :username";
+        $stmt = $this->db->prepare($query);
+        $stmt->execute(['username' => $username]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Update user profile (username and nis only)
+     * @param int $id
+     * @param string $username
+     * @param string $nis
+     * @return bool
+     */
+    public function updateProfile($id, $username, $nis)
+    {
+        $query = "UPDATE users SET username = :username, nis = :nis WHERE id = :id";
+        $stmt = $this->db->prepare($query);
+        return $stmt->execute([
+            'username' => $username,
+            'nis' => $nis,
+            'id' => $id
+        ]);
+    }
+
+    /**
+     * Update user password
+     * @param int $id
+     * @param string $newPassword
+     * @return bool
+     */
+    public function updatePassword($id, $newPassword)
+    {
+        $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+        $query = "UPDATE users SET password = :password WHERE id = :id";
+        $stmt = $this->db->prepare($query);
+        return $stmt->execute([
+            'password' => $hashedPassword,
+            'id' => $id
+        ]);
+    }
 }

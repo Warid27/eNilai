@@ -93,6 +93,39 @@ class Score
     }
 
     /**
+     * Update only a specific subject score while preserving others
+     * @param int $id Record ID
+     * @param string $subject Subject name (e.g., 'Matematika', 'Bahasa Indonesia', 'Bahasa Inggris')
+     * @param float $value New score value
+     * @return bool
+     */
+    public function updateSubjectScore($id, $subject, $value)
+    {
+        // First, get the current scores
+        $currentRecord = $this->getById($id);
+        if (!$currentRecord) {
+            return false;
+        }
+
+        // Decode existing scores
+        $existingScores = json_decode($currentRecord['scores'], true);
+        if ($existingScores === null) {
+            // Initialize with default scores if JSON is invalid
+            $existingScores = [
+                'Matematika' => 0,
+                'Bahasa Indonesia' => 0,
+                'Bahasa Inggris' => 0
+            ];
+        }
+
+        // Update only the specific subject
+        $existingScores[$subject] = floatval($value);
+
+        // Save back to database
+        return $this->update($id, $existingScores);
+    }
+
+    /**
      * Optional: Get scores by user ID (useful for profile/report)
      * @param int $id_user
      * @return array|false
@@ -103,5 +136,74 @@ class Score
         $stmt = $this->db->prepare($query);
         $stmt->execute(['id_user' => $id_user]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Nullify all scores for a specific record (set all subjects to null)
+     * @param int $id Record ID
+     * @return bool
+     */
+    public function nullifyAllScores($id)
+    {
+        $nullScores = [
+            'Matematika' => null,
+            'Bahasa Indonesia' => null,
+            'Bahasa Inggris' => null
+        ];
+        return $this->update($id, $nullScores);
+    }
+
+    /**
+     * Nullify specific subject score (set to null)
+     * @param int $id Record ID
+     * @param string $subject Subject name
+     * @return bool
+     */
+    public function nullifySubjectScore($id, $subject)
+    {
+        // First, get the current scores
+        $currentRecord = $this->getById($id);
+        if (!$currentRecord) {
+            return false;
+        }
+
+        // Decode existing scores
+        $existingScores = json_decode($currentRecord['scores'], true);
+        if ($existingScores === null) {
+            // Initialize with default scores if JSON is invalid
+            $existingScores = [
+                'Matematika' => null,
+                'Bahasa Indonesia' => null,
+                'Bahasa Inggris' => null
+            ];
+        }
+
+        // Set only the specific subject to null
+        $existingScores[$subject] = null;
+
+        // Save back to database
+        return $this->update($id, $existingScores);
+    }
+
+    /**
+     * Create default score record for a new student
+     * @param int $id_user User ID
+     * @return bool
+     */
+    public function createDefaultScores($id_user)
+    {
+        // Check if scores already exist for this user
+        $existing = $this->getByUserId($id_user);
+        if ($existing) {
+            return true; // Already exists, no need to create
+        }
+
+        $defaultScores = [
+            'Matematika' => 0,
+            'Bahasa Indonesia' => 0,
+            'Bahasa Inggris' => 0
+        ];
+        
+        return $this->create($id_user, $defaultScores);
     }
 }

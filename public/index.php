@@ -1,7 +1,7 @@
 <?php
-// ini_set('display_errors', 1);
-// ini_set('display_startup_errors', 1);
-// error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 session_start();
 
 // Define base URL dynamically
@@ -14,6 +14,7 @@ require_once dirname(__FILE__) . '/../app/controllers/AuthController.php';
 require_once dirname(__FILE__) . '/../app/controllers/ScoreController.php';
 require_once dirname(__FILE__) . '/../app/controllers/GalleryController.php';
 require_once dirname(__FILE__) . '/../app/controllers/UserController.php';
+require_once dirname(__FILE__) . '/../app/controllers/ProfileController.php';
 
 // Get page parameter
 $page = trim($_GET['page'] ?? 'home');
@@ -48,11 +49,24 @@ switch ($page) {
         require_once dirname(__FILE__) . '/../app/views/DashboardView.php';
         break;
     case 'user':
+    case 'users':
         $controller = new UserController();
         if (isset($_GET['edit'])) {
             $controller->edit($_GET['edit']);
         } elseif (isset($_GET['delete'])) {
             $controller->delete($_GET['delete']);
+        } else {
+            $controller->index();
+        }
+        break;
+    case 'profile':
+        $controller = new ProfileController();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (isset($_POST['action']) && $_POST['action'] === 'update_profile') {
+                $controller->updateProfile();
+            } elseif (isset($_POST['action']) && $_POST['action'] === 'change_password') {
+                $controller->changePassword();
+            }
         } else {
             $controller->index();
         }

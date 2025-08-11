@@ -219,6 +219,144 @@ if (isset($scores) && $currentPage == "nilai" && !isset($_GET['edit']) && $_SESS
         // Trigger on page load to check initial selection
         document.getElementById('userSelect').dispatchEvent(new Event('change'));
     </script>
+<?php elseif (isset($_GET['delete'])): ?>
+    <?php
+    // Get score data for delete confirmation
+    $deleteId = (int)$_GET['delete'];
+    $userRole = $_SESSION['id_role'];
+    ?>
+    <div class="page-header">
+        <div class="page-title">
+            <h1>
+                <a href="?page=nilai" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <i class="fas fa-trash"></i> Hapus Nilai
+            </h1>
+            <p>Pilih jenis penghapusan nilai</p>
+        </div>
+    </div>
+
+    <div class="form-container">
+        <div class="form-card">
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>Peringatan:</strong> Tindakan ini akan menghapus (mengosongkan) nilai yang dipilih dan tidak dapat dibatalkan.
+            </div>
+
+            <form method="POST" action="?page=nilai&delete=<?= $deleteId ?>" id="deleteScoreForm">
+                <?php if ($userRole <= 1): // Superadmin and Admin ?>
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-list"></i> Pilihan Penghapusan
+                        </label>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="delete_type" value="all" required>
+                                <span class="radio-custom"></span>
+                                <div class="radio-content">
+                                    <strong>Hapus Semua Nilai</strong>
+                                    <small>Menghapus nilai untuk semua mata pelajaran</small>
+                                </div>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="delete_type" value="subject" required>
+                                <span class="radio-custom"></span>
+                                <div class="radio-content">
+                                    <strong>Hapus Nilai Mata Pelajaran Tertentu</strong>
+                                    <small>Menghapus nilai untuk mata pelajaran yang dipilih saja</small>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="subjectGroup" style="display: none;">
+                        <label for="subject">
+                            <i class="fas fa-book"></i> Pilih Mata Pelajaran
+                        </label>
+                        <select name="subject" id="subject" class="form-control">
+                            <option value="">-- Pilih Mata Pelajaran --</option>
+                            <option value="Matematika">Matematika</option>
+                            <option value="Bahasa Indonesia">Bahasa Indonesia</option>
+                            <option value="Bahasa Inggris">Bahasa Inggris</option>
+                        </select>
+                    </div>
+                <?php elseif ($userRole >= 2 && $userRole <= 4): // Gurus ?>
+                    <?php
+                    $allowedSubjects = [
+                        2 => 'Bahasa Indonesia',
+                        3 => 'Bahasa Inggris', 
+                        4 => 'Matematika'
+                    ];
+                    $guruSubject = $allowedSubjects[$userRole];
+                    ?>
+                    <input type="hidden" name="delete_type" value="subject">
+                    <input type="hidden" name="subject" value="<?= $guruSubject ?>">
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        Anda akan menghapus nilai untuk mata pelajaran <strong><?= $guruSubject ?></strong> sesuai dengan role Anda.
+                    </div>
+                <?php endif; ?>
+
+                <div class="form-actions">
+                    <a href="?page=nilai" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Batal
+                    </a>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Hapus Nilai
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Show/hide subject selection based on delete type
+        document.querySelectorAll('input[name="delete_type"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const subjectGroup = document.getElementById('subjectGroup');
+                const subjectSelect = document.getElementById('subject');
+                
+                if (this.value === 'subject') {
+                    subjectGroup.style.display = 'block';
+                    subjectSelect.required = true;
+                } else {
+                    subjectGroup.style.display = 'none';
+                    subjectSelect.required = false;
+                    subjectSelect.value = '';
+                }
+            });
+        });
+
+        // Form validation
+        document.getElementById('deleteScoreForm').addEventListener('submit', function(e) {
+            const deleteType = document.querySelector('input[name="delete_type"]:checked');
+            if (!deleteType) {
+                e.preventDefault();
+                alert('Silakan pilih jenis penghapusan!');
+                return;
+            }
+            
+            if (deleteType.value === 'subject') {
+                const subject = document.getElementById('subject');
+                if (subject && !subject.value) {
+                    e.preventDefault();
+                    alert('Silakan pilih mata pelajaran!');
+                    return;
+                }
+            }
+            
+            // Final confirmation
+            const confirmMessage = deleteType.value === 'all' 
+                ? 'Apakah Anda yakin ingin menghapus SEMUA nilai?' 
+                : `Apakah Anda yakin ingin menghapus nilai ${subject ? subject.value : ''}?`;
+                
+            if (!confirm(confirmMessage)) {
+                e.preventDefault();
+            }
+        });
+    </script>
 <?php endif; ?>
 
 <?php

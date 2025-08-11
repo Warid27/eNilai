@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Aug 05, 2025 at 12:28 AM
+-- Generation Time: Aug 11, 2025 at 03:33 AM
 -- Server version: 8.4.0
 -- PHP Version: 8.3.1
 
@@ -57,6 +57,7 @@ CREATE TABLE `roles` (
 --
 
 INSERT INTO `roles` (`id`, `role`) VALUES
+(0, 'Superadmin'),
 (1, 'Admin'),
 (2, 'Guru Bahasa Indonesia'),
 (3, 'Guru Bahasa Inggris'),
@@ -82,7 +83,8 @@ CREATE TABLE `scores` (
 
 INSERT INTO `scores` (`id`, `id_user`, `scores`) VALUES
 (2, 4, '{\"Matematika\": 95, \"Bahasa Inggris\": 98, \"Bahasa Indonesia\": 90}'),
-(4, 10, '{\"Matematika\": 50, \"Bahasa Inggris\": 100, \"Bahasa Indonesia\": 0}');
+(4, 10, '{\"Matematika\": 50, \"Bahasa Inggris\": 100, \"Bahasa Indonesia\": 0}'),
+(5, 9, '{\"Matematika\": 0, \"Bahasa Inggris\": 0, \"Bahasa Indonesia\": 100}');
 
 -- --------------------------------------------------------
 
@@ -103,7 +105,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `username`, `password`, `nis`, `id_role`) VALUES
-(3, 'newadmin', '$2y$10$DuFXSfV3pYCZeYKkCGk0v.mBuib6D660I1zQkzDy2BQSD1h0vWapu', NULL, 1),
+(3, 'superadmin', '$2y$10$eQbC5BJ4Kqs/0Ji5HmsCoOdBPUPCNnEeQGcXpVyzjDVWNXUxg.lve', NULL, 0),
 (4, 'irfan', '$2y$10$VXo/oNfYPPXZsFPG7nleAOUVmfKWM6LzQh2GGEYfy899qgsbQhYj6', 12345, 6),
 (5, 'guru indo', '$2y$10$aLDM19ND54mu9qDOWzteq.6ysPF0cHd5Z1dgcnR8UvFJVItZUDKre', NULL, 2),
 (6, 'guru inggris', '$2y$10$AvhAdOL1YtqXqlU2Xp0tGOsPKtwoiRolD9Nu4QXrXcRiupXDSyB36', NULL, 3),
@@ -111,7 +113,9 @@ INSERT INTO `users` (`id`, `username`, `password`, `nis`, `id_role`) VALUES
 (9, 'warid', '$2y$10$/P1asbP.ai7XOZoFWFoZdeHY18TP4VUW6l0/zD0AV.e0dgpWohOuO', 12344, 6),
 (10, 'Siswa Baru', '$2y$10$a0gxfTSIB3imT5K0JBMDW.lCP/AjPlLKrG9/nOROW8RJpcYNBkWVK', 555555, 6),
 (12, 'walkel', '$2y$10$YOOviw8WlJdZyQEcV0Rj7OcvK/251nR6IpP68VpY/EkebnEMYOtY2', NULL, 5),
-(13, 'walkel2', '$2y$10$vfeeWYHutkKVSldEk/nEseOkmaq/c3fpLNCvOPcaEPdVjHzpE756K', NULL, 5);
+(13, 'walkel2', '$2y$10$vfeeWYHutkKVSldEk/nEseOkmaq/c3fpLNCvOPcaEPdVjHzpE756K', NULL, 5),
+(14, 'ADMIN BARU', '$2y$10$.uzz1F7vuezarmND2OUl/O6Q.e5aIe1ZYMWKJ45MaqFGq59Ft6PLm', NULL, 1),
+(16, 'admin123', '$2y$10$FDCj/ecMABc53xZc2frXX.R7X2z94m157njzRTjKFgbl6HFsE6BoS', NULL, 1);
 
 --
 -- Indexes for dumped tables
@@ -159,19 +163,19 @@ ALTER TABLE `gallery`
 -- AUTO_INCREMENT for table `roles`
 --
 ALTER TABLE `roles`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `scores`
 --
 ALTER TABLE `scores`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- Constraints for dumped tables
